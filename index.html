@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DFA Problem Solver</title>
+
+  <!-- Inter font for modern typography -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <div class="header-icon">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="app-title">DFA Problem Solver</h1>
+          <p class="subtitle">Rule-based generator and simulator with clean visuals</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Grid -->
+    <main class="main-grid">
+      <!-- Builder Panel -->
+      <section class="panel panel-emphasis">
+        <div class="panel-title-row">
+          <h2 class="panel-title">Design DFA</h2>
+          <span class="badge badge-primary">Builder</span>
+        </div>
+
+        <div class="inline-hint">
+          <p>Use presets and controls to express common DFA problems without memorizing construction rules.</p>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="problemType">Problem type</label>
+            <select id="problemType" class="input">
+              <optgroup label="Pattern matching">
+                <option value="ends-with">Ends with pattern</option>
+                <option value="all-one-symbol-or-another">Strings of only A or only B</option>
+                <option value="starts-with">Starts with pattern</option>
+                <option value="contains">Contains substring</option>
+                <option value="exactly-pattern">Exactly pattern</option>
+                <option value="not-contains">Does NOT contain substring</option>
+                <option value="start-end-pattern">Starts & Ends with patterns</option>
+                <option value="end-with-or-even-after">Ends with A or Even Bs after last A</option>
+                <option value="symbol-followed-by-pattern">Each A followed by pattern</option>
+                <option value="only-one-symbol">Strings consisting only of a chosen A</option>
+                <option value="each-surrounded">Each A surrounded by B</option>
+              </optgroup>
+
+              <optgroup label="Symbol counting">
+                <option value="even-count">Even count of A</option>
+                <option value="odd-count">Odd count of A</option>
+                <option value="at-least">At least N occurrences of A</option>
+                <option value="exact-count">Exactly N occurrences of A</option>
+                <option value="exact-n-a-at-least-m-b">Exactly N of A and At Least M of B</option>
+                <option value="equal-count-patterns">Equal count of patterns</option>
+              </optgroup>
+
+              <optgroup label="Special patterns">
+                <option value="same-start-end">Same start & end character</option>
+                <option value="alternating">Alternating characters</option>
+                <option value="no-consecutive">No consecutive A</option>
+                <option value="divisible-by">Divisible by</option>
+                <option value="length-at-most">Length at most N</option>
+                <option value="start-parity-length">Start A odd length or Start B even length</option>
+                <option value="start-10-or-end-0-odd">Starts with 10 or Ends with 0 and Odd length</option>
+              </optgroup>
+
+              <optgroup label="Position rules">
+                <option value="odd-positions-symbol">Odd positions are symbol</option>
+                <option value="even-positions-symbol">Even positions are symbol</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div id="patternGroup" class="form-group">
+            <label for="pattern">Pattern</label>
+            <input type="text" id="pattern" class="input" placeholder="e.g., 01 or 110" value="01" />
+          </div>
+
+          <div id="symbolGroup" class="form-group" style="display:none;">
+            <label for="symbol">Symbol</label>
+            <input type="text" id="symbol" class="input" placeholder="e.g., 0" maxlength="1" />
+          </div>
+
+          <div id="onlyOneSymbolGroup" class="form-group" style="display:none;">
+            <label for="onlyOneSymbol">Symbol</label>
+            <input type="text" id="onlyOneSymbol" class="input" placeholder="e.g., 0 or 1" maxlength="1" value="0" />
+          </div>
+
+          <div id="positionsSymbolGroup" class="form-group" style="display:none;">
+            <label for="positionsSymbol">Symbol</label>
+            <input type="text" id="positionsSymbol" class="input" placeholder="e.g., 1" maxlength="1" value="1" />
+          </div>
+
+          <div id="onlySymbolsGroup" class="form-pair" style="display:none;">
+            <div class="form-group">
+              <label for="onlySymbolA">Symbol A</label>
+              <input type="text" id="onlySymbolA" class="input" placeholder="e.g., 0" maxlength="1" value="0" />
+            </div>
+            <div class="form-group">
+              <label for="onlySymbolB">Symbol B</label>
+              <input type="text" id="onlySymbolB" class="input" placeholder="e.g., 1" maxlength="1" value="1" />
+            </div>
+          </div>
+
+          <div id="atLeastGroup" class="form-pair" style="display:none;">
+            <div class="form-group">
+              <label for="atLeastSymbol">Symbol</label>
+              <input type="text" id="atLeastSymbol" class="input" placeholder="e.g., 1" maxlength="1" />
+            </div>
+            <div class="form-group">
+              <label for="atLeastCount">Minimum count</label>
+              <input type="number" id="atLeastCount" class="input" placeholder="e.g., 2" min="1" value="2" />
+            </div>
+          </div>
+
+          <div id="exactCountGroup" class="form-pair" style="display:none;">
+            <div class="form-group">
+              <label for="exactSymbol">Symbol</label>
+              <input type="text" id="exactSymbol" class="input" placeholder="e.g., 0" maxlength="1" />
+            </div>
+            <div class="form-group">
+              <label for="exactCount">Exact count</label>
+              <input type="number" id="exactCount" class="input" placeholder="e.g., 3" min="0" value="3" />
+            </div>
+          </div>
+
+          <div id="equalPatternsGroup" class="form-pair" style="display:none;">
+            <div class="form-group">
+              <label for="pattern1">Pattern 1</label>
+              <input type="text" id="pattern1" class="input" placeholder="e.g., 01" />
+            </div>
+            <div class="form-group">
+              <label for="pattern2">Pattern 2</label>
+              <input type="text" id="pattern2" class="input" placeholder="e.g., 10" />
+            </div>
+          </div>
+
+          <div id="startEndGroup" class="form-pair" style="display:none;">
+            <div class="form-group">
+              <label for="startPattern">Start pattern</label>
+              <input type="text" id="startPattern" class="input" placeholder="e.g., 11" />
+            </div>
+            <div class="form-group">
+              <label for="endPattern">End pattern</label>
+              <input type="text" id="endPattern" class="input" placeholder="e.g., 01" />
+            </div>
+          </div>
+
+          <div id="endWithOrEvenAfterGroup" class="form-pair" style="display:none;">
+            <div class="form-group">
+              <label for="endSymbol">Symbol 1 (end symbol)</label>
+              <input type="text" id="endSymbol" class="input" placeholder="e.g., 1" maxlength="1" />
+            </div>
+            <div class="form-group">
+              <label for="countSymbol">Symbol 2 (count symbol)</label>
+              <input type="text" id="countSymbol" class="input" placeholder="e.g., 0" maxlength="1" />
+            </div>
+          </div>
+
+          <div id="symbolFollowedByPatternGroup" class="form-pair" style="display:none;">
+            <div class="form-group">
+              <label for="followedSymbol">Symbol</label>
+              <input type="text" id="followedSymbol" class="input" placeholder="e.g., 0" maxlength="1" />
+            </div>
+            <div class="form-group">
+              <label for="followingPattern">Following pattern</label>
+              <input type="text" id="followingPattern" class="input" placeholder="e.g., 11" />
+            </div>
+          </div>
+
+          <div id="exactNAAtLeastMBGroup" class="form-quad" style="display:none;">
+            <div class="form-group">
+              <label for="symbolA">Symbol A</label>
+              <input type="text" id="symbolA" class="input" placeholder="e.g., 0" maxlength="1" value="0" />
+            </div>
+            <div class="form-group">
+              <label for="exactN">Exact count of A</label>
+              <input type="number" id="exactN" class="input" placeholder="e.g., 4" min="0" value="4" />
+            </div>
+            <div class="form-group">
+              <label for="symbolB">Symbol B</label>
+              <input type="text" id="symbolB" class="input" placeholder="e.g., 1" maxlength="1" value="1" />
+            </div>
+            <div class="form-group">
+              <label for="atLeastM">Minimum count of B</label>
+              <input type="number" id="atLeastM" class="input" placeholder="e.g., 2" min="0" value="2" />
+            </div>
+          </div>
+
+          <div id="eachSurroundedGroup" class="form-pair" style="display:none;">
+            <div class="form-group">
+              <label for="surroundedSymbol">Surrounded symbol</label>
+              <input type="text" id="surroundedSymbol" class="input" placeholder="e.g., 0" maxlength="1" value="0" />
+            </div>
+            <div class="form-group">
+              <label for="surroundingSymbol">Surrounding symbol</label>
+              <input type="text" id="surroundingSymbol" class="input" placeholder="e.g., 1" maxlength="1" value="1" />
+            </div>
+          </div>
+
+          <div id="startParityLengthGroup" class="form-pair" style="display:none;">
+            <div class="form-group">
+              <label for="startOddSymbol">Start symbol for odd length</label>
+              <input type="text" id="startOddSymbol" class="input" placeholder="e.g., 0" maxlength="1" value="0" />
+            </div>
+            <div class="form-group">
+              <label for="startEvenSymbol">Start symbol for even length</label>
+              <input type="text" id="startEvenSymbol" class="input" placeholder="e.g., 1" maxlength="1" value="1" />
+            </div>
+          </div>
+
+          <div id="divisibleByGroup" class="form-group" style="display:none;">
+            <label for="divisibleBy">Divisible by</label>
+            <input type="number" id="divisibleBy" class="input" placeholder="e.g., 3" min="2" value="3" />
+          </div>
+
+          <div id="lengthAtMostGroup" class="form-group" style="display:none;">
+            <label for="lengthAtMost">Maximum length</label>
+            <input type="number" id="lengthAtMost" class="input" placeholder="e.g., 5" min="1" value="5" />
+          </div>
+
+          <div class="form-group">
+            <label for="alphabet">Alphabet (no spaces)</label>
+            <input type="text" id="alphabet" class="input" placeholder="e.g., 01 or abc" value="01" />
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button id="generateBtn" class="btn btn-primary">
+            <span class="btn-icon">
+              <svg class="icon-small" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+            </span>
+            <span class="btn-label">Generate DFA</span>
+          </button>
+          <button id="clearBtn" class="btn btn-outline">
+            <span class="btn-icon">
+              <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </span>
+            <span class="btn-label">Clear</span>
+          </button>
+        </div>
+
+        <div id="builderHint" class="helper-hint">
+          <p>Tip: Set alphabet first to align pattern and symbol options.</p>
+        </div>
+      </section>
+
+      <!-- Simulator Panel -->
+      <section class="panel">
+        <div class="panel-title-row">
+          <h2 class="panel-title">Test string</h2>
+          <span class="badge badge-success">Simulator</span>
+        </div>
+
+        <div class="form-group">
+          <label for="testString">Input string</label>
+          <input type="text" id="testString" class="input" placeholder="Enter string to test" disabled />
+        </div>
+
+        <div class="button-row">
+          <button id="testBtn" class="btn btn-success" disabled>
+            <span class="btn-icon">
+              <svg class="icon-small" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+            </span>
+            <span class="btn-label">Test string</span>
+          </button>
+        </div>
+
+        <div id="result" class="result" style="display:none;"></div>
+        
+        <div class="empty-placeholder">
+          <h3>No DFA generated yet</h3>
+          <p>Configure rules on the left and click <strong>Generate DFA</strong> to unlock testing.</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Visualization -->
+    <section id="dfaVisualization" class="panel" style="display:none;">
+      <div class="panel-title-row">
+        <h2 class="panel-title">Generated DFA</h2>
+        <span class="badge">Visualization</span>
+      </div>
+
+      <div id="dfaDescription" class="description"></div>
+
+      <h3 class="section-title">State diagram</h3>
+      <div class="diagram-container">
+        <canvas id="stateDiagram" width="900" height="600" aria-label="DFA state diagram"></canvas>
+      </div>
+
+      <div class="legend">
+        <p><span class="legend-title">Legend:</span></p>
+        <ul class="legend-list">
+          <li>Blue circles = Regular states</li>
+          <li>Green double circles = Accept states</li>
+          <li>Arrow from “start” = Initial state</li>
+          <li>Edge labels = Input symbols</li>
+        </ul>
+      </div>
+
+      <h3 class="section-title">Transition table</h3>
+      <div class="table-container">
+        <table id="transitionTable" aria-label="Transition table"></table>
+      </div>
+      <div class="table-legend">
+        <p>→ = Start state | ★ = Accept state</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card stat-blue">
+          <p class="stat-label">Q - Internal states</p>
+          <p class="stat-value" id="statesList"></p>
+        </div>
+        <div class="stat-card stat-teal">
+          <p class="stat-label">F - Final states</p>
+          <p class="stat-value" id="acceptStatesList"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Toast -->
+    <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
