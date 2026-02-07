@@ -119,6 +119,69 @@ function updateFormFields() {
   }
 }
 
+// ===== ENHANCED INPUT VALIDATION FOR BETTER ACCURACY =====
+function validateInputs(type) {
+  const alpha = alphabet.value.trim();
+  
+  // Validate alphabet
+  if (!alpha || alpha.length === 0) {
+    throw new Error('❌ Alphabet cannot be empty');
+  }
+  
+  // Check for duplicate symbols
+  const uniqueSymbols = new Set(alpha.split(''));
+  if (uniqueSymbols.size !== alpha.length) {
+    throw new Error('❌ Alphabet contains duplicate symbols');
+  }
+  
+  // Check for whitespace
+  if (/\s/.test(alpha)) {
+    throw new Error('❌ Alphabet cannot contain spaces');
+  }
+  
+  // Pattern validations
+  if (['ends-with', 'starts-with', 'contains', 'exactly-pattern', 'not-contains'].includes(type)) {
+    const pat = pattern.value.trim();
+    if (!pat) throw new Error('❌ Pattern cannot be empty');
+    for (let char of pat) {
+      if (!alpha.includes(char)) {
+        throw new Error(`❌ Pattern symbol '${char}' not in alphabet {${alpha}}`);
+      }
+    }
+  }
+  
+  // Symbol validations
+  if (['even-count', 'odd-count', 'no-consecutive'].includes(type)) {
+    const sym = document.getElementById('symbol').value.trim();
+    if (!sym) throw new Error('❌ Symbol cannot be empty');
+    if (!alpha.includes(sym)) {
+      throw new Error(`❌ Symbol '${sym}' not in alphabet`);
+    }
+  }
+  
+  // Count validations
+  if (type === 'at-least' || type === 'exact-count') {
+    const fieldId = type === 'at-least' ? 'atLeastCount' : 'exactCount';
+    const count = parseInt(document.getElementById(fieldId).value);
+    const minVal = type === 'at-least' ? 1 : 0;
+    if (isNaN(count) || count < minVal) {
+      throw new Error(`❌ Count must be at least ${minVal}`);
+    }
+    if (count > 20) throw new Error('❌ Count too large (max 20 for performance)');
+  }
+  
+  // Divisor validations
+  if (type === 'divisible-by') {
+    const divisor = parseInt(document.getElementById('divisibleBy').value);
+    if (isNaN(divisor) || divisor < 2) {
+      throw new Error('❌ Divisor must be at least 2');
+    }
+    if (divisor > 100) throw new Error('❌ Divisor too large (max 100)');
+  }
+  
+  return true;
+}
+
 // Generate DFA
 function handleGenerate() {
   const done = withLoading(generateBtn, 'Generating...');
@@ -127,6 +190,9 @@ function handleGenerate() {
   let dfa;
 
   try {
+    // ✨ Validate inputs before generating
+    validateInputs(type);
+    
     switch(type) {
       case 'ends-with':
         dfa = generateEndsWithDFA(pattern.value, alpha); break;
@@ -248,7 +314,27 @@ function handleGenerate() {
     document.querySelector('.empty-placeholder').style.display = 'none';
     showToast('DFA generated successfully');
   } catch (error) {
-    alert('Error generating DFA: ' + error.message);
+    // Enhanced error display with visual feedback
+    const errorMessage = error.message || 'Unknown error occurred';
+    resultDiv.style.display = 'block';
+    resultDiv.className = 'result error';
+    resultDiv.innerHTML = `
+      <div class="result-header error">
+        <svg class="icon-small" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+        Generation Error
+      </div>
+      <div class="result-details">
+        <p style="color: #991b1b; font-weight: 600;">${errorMessage}</p>
+        <p style="margin-top: 8px; font-size: 0.85rem; color: #64748b;">
+          Please check your inputs and try again.
+        </p>
+      </div>
+    `;
+    console.error('DFA Generation Error:', error);
   } finally {
     done();
   }
