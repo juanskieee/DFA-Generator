@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — E-Karte System</title>
+    <link rel="stylesheet" href="~/Assets/css/site.css" />
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     TOP NAV BAR
+     Replaces the WinForms MDI parent / panel nav.
+     Links mirror Button5 (RepeatBM), btnMCD,
+     btnWithAction, and the Form4 trigger from Form1.
+     ══════════════════════════════════════════════ -->
+<nav class="site-nav">
+    <div class="nav-brand">
+        <span class="nav-logo">⚙</span>
+        <span class="nav-title">E-Karte System</span>
+    </div>
+
+    <ul class="nav-links">
+        <li>
+            <a href="/Monitoring"
+               class="nav-link @(ViewData["Page"]?.ToString() == "Monitoring" ? "active" : "")">
+               Monitoring
+            </a>
+        </li>
+        <li>
+            <a href="/EvidenceMaking"
+               class="nav-link @(ViewData["Page"]?.ToString() == "EvidenceMaking" ? "active" : "")">
+               Evidence Making
+            </a>
+        </li>
+        <li>
+            <a href="/ActionCards"
+               class="nav-link @(ViewData["Page"]?.ToString() == "ActionCards" ? "active" : "")">
+               Action Cards
+            </a>
+        </li>
+        <li>
+            <a href="/Reports"
+               class="nav-link @(ViewData["Page"]?.ToString() == "Reports" ? "active" : "")">
+               Reports
+            </a>
+        </li>
+    </ul>
+
+    <div class="nav-right">
+        <span class="nav-version">v@(ViewData["AppVersion"] ?? "1.0")</span>
+    </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════
+     PAGE CONTENT
+     ══════════════════════════════════════════════ -->
+<main class="site-main">
+    @RenderBody()
+</main>
+
+@RenderSection("Scripts", required: false)
+</body>
+</html>
