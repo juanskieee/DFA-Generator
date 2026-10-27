@@ -1,0 +1,4 @@
+// ── Add these lines to Program.cs alongside the existing repository/service registrations ──
+
+builder.Services.AddSingleton<AlertBoardRepository>();
+builder.Services.AddSingleton<AlertBoardService>();

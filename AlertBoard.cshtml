@@ -1,0 +1,135 @@
+@page
+@model MachineKarte.Web.Pages.AlertBoardModel
+@{
+    ViewData["Title"] = "Alert Board";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/Assets/css/AlertBoard.css" />
+}
+
+<div id="alertBoard" class="ab-container">
+
+    <!-- ── Toolbar ──────────────────────────────────────────────────────── -->
+    <div class="ab-toolbar">
+        <label>From</label>
+        <input type="datetime-local" id="dtFrom" />
+        <label>To</label>
+        <input type="datetime-local" id="dtTo" />
+
+        <label>User</label>
+        <select id="selUser">
+            <option value="">All</option>
+            <option value="CC">CC</option>
+            <option value="EEE">EEE</option>
+            <option value="VIS">VIS</option>
+            <option value="TE">TE</option>
+        </select>
+
+        <button id="btnSearch" class="ab-btn-search">Search</button>
+
+        <div id="progressBar" class="ab-progress" style="display:none">
+            <div id="progressInner" class="ab-progress-inner"></div>
+        </div>
+    </div>
+
+    <!-- ── Main grid panel ──────────────────────────────────────────────── -->
+    <div class="ab-panel" id="panelMain">
+
+        <!-- Header row -->
+        <div class="ab-header-row">
+            <div class="ab-hdr-process">Process</div>
+            <div class="ab-hdr-loc" title="LSI1-1F">1-1F</div>
+            <div class="ab-hdr-loc" title="LSI1-2F">1-2F</div>
+            <div class="ab-hdr-loc" title="LSI2-1F">2-1F</div>
+            <div class="ab-hdr-loc" title="LSI2-2F">2-2F</div>
+            <div class="ab-hdr-loc" title="LSI2-3F">2-3F</div>
+            <div class="ab-hdr-loc" title="LSI3-1F">3-1F</div>
+            <div class="ab-hdr-loc" title="LSI3-2F">3-2F</div>
+            <div class="ab-hdr-loc" title="LSI3-3F">3-3F</div>
+            <div class="ab-hdr-loc" title="LSI3-4F">3-4F</div>
+            <div class="ab-hdr-total">TOTAL</div>
+        </div>
+
+        <!-- Process rows — cells are populated by JS -->
+        @foreach (var proc in new[]{"DC","DB","WB","MP","PL","ATC","SING","FL","FT","TP","EDS","MEMS"})
+        {
+            <!-- Columns match cell-key suffixes:
+                 0=LSI1-1F  1=LSI1-2F  2=LSI2-1F  3=LSI2-2F
+                 4=LSI2-3F  5=LSI3-1F  6=LSI3-2F  7=LSI3-3F(→6)  8=LSI3-4F  -->
+            <div class="ab-proc-row" data-process="@proc">
+                <div class="ab-cell-label">@proc</div>
+
+                @{
+                    // Map each column to a cell key.  "--" = this process has no
+                    // station at that location (grey, non-clickable).
+                    string[] keys = proc switch {
+                        "DC"   => new[]{"DC_0",  "--",    "DC_2",  "DC_3",  "DC_4",  "--",    "DC_6",  "--",    "--"},
+                        "DB"   => new[]{"DB_0",  "--",    "DB_2",  "DB_3",  "DB_4",  "--",    "DB_6",  "--",    "--"},
+                        "WB"   => new[]{"WB_0",  "--",    "WB_2",  "WB_3",  "WB_4",  "--",    "WB_6",  "--",    "--"},
+                        "MP"   => new[]{"MP_0",  "--",    "MP_2",  "MP_3",  "MP_4",  "--",    "MP_6",  "--",    "--"},
+                        "PL"   => new[]{"PL_0",  "--",    "PL_2",  "PL_3",  "PL_4",  "PL_5", "--",    "--",    "--"},
+                        "ATC"  => new[]{"ATC_0", "ATC_1","ATC_2","ATC_3","ATC_4","ATC_65","--","ATC_6","--"},
+                        "SING" => new[]{"--",    "SING_1","SING_2","SING_3","SING_4","--",   "--","SING_5","--"},
+                        "FL"   => new[]{"--",    "FL_1",  "FL_2",  "FL_3",  "FL_4",  "--",    "--",    "FL_5",  "--"},
+                        "FT"   => new[]{"--",    "FT_1",  "FT_2",  "FT_3",  "FT_4",  "--",    "--",    "FT_5",  "--"},
+                        "TP"   => new[]{"--",    "TP_1",  "TP_2",  "TP_3",  "TP_4",  "--",    "--",    "TP_5",  "--"},
+                        "EDS"  => new[]{"--",    "--",    "--",    "--",    "--",    "--",    "--",    "--",    "EDS_1"},
+                        "MEMS" => new[]{"--",    "--",    "--",    "--",    "--",    "--",    "MEMS_1","--",   "--"},
+                        _      => new[]{"--","--","--","--","--","--","--","--","--"}
+                    };
+                }
+
+                @for (int col = 0; col < keys.Length; col++)
+                {
+                    if (keys[col] == "--")
+                    {
+                        <div class="ab-cell ab-cell-empty"></div>
+                    }
+                    else
+                    {
+                        <div class="ab-cell ab-cell-active"
+                             data-cell="@keys[col]"
+                             id="cell_@keys[col]">0</div>
+                    }
+                }
+
+                <!-- Process-row total -->
+                <div class="ab-cell ab-cell-total" id="ptotal_@proc">0</div>
+            </div>
+        }
+
+        <!-- Location totals row -->
+        <div class="ab-proc-row ab-totals-row">
+            <div class="ab-cell-label">TOTAL</div>
+            <div class="ab-cell ab-cell-total" id="ltotal_LSI1-1F">0</div>
+            <div class="ab-cell ab-cell-total" id="ltotal_LSI1-2F">0</div>
+            <div class="ab-cell ab-cell-total" id="ltotal_LSI2-1F">0</div>
+            <div class="ab-cell ab-cell-total" id="ltotal_LSI2-2F">0</div>
+            <div class="ab-cell ab-cell-total" id="ltotal_LSI2-3F">0</div>
+            <div class="ab-cell ab-cell-total" id="ltotal_LSI3-1F">0</div>
+            <div class="ab-cell ab-cell-total" id="ltotal_LSI3-2F">0</div>
+            <div class="ab-cell ab-cell-total" id="ltotal_LSI3-3F">0</div>
+            <div class="ab-cell ab-cell-total" id="ltotal_LSI3-4F">0</div>
+            <div class="ab-cell ab-cell-grand" id="grandTotal">0</div>
+        </div>
+
+    </div><!-- /panelMain -->
+
+    <!-- ── Drilldown panel (mirrors VB Panel4) ──────────────────────────── -->
+    <div class="ab-drilldown" id="panelDrilldown" style="display:none">
+        <div class="ab-drilldown-header">
+            <span id="drilldownTitle">—</span>
+            <div class="ab-drilldown-btns">
+                <button id="btnDrillClose" class="ab-btn">Close</button>
+                <button id="btnDrillGo"    class="ab-btn ab-btn-primary">View in Monitoring</button>
+            </div>
+        </div>
+        <ul id="drilldownList" class="ab-machine-list"></ul>
+    </div>
+
+</div><!-- /alertBoard -->
+
+@section Scripts {
+    <script src="~/Assets/js/AlertBoard.js"></script>
+}
