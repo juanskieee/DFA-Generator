@@ -1,0 +1,56 @@
+I am continuing a WinForms → ASP.NET Core C# conversion project called MachineKarte.Web (the E-Karte System). Here is the full context:
+
+Project: MachineKarte.Web — ASP.NET Core 8, Razor Pages, plain SqlClient, AJAX via fetch(), no ORM, no MVC controllers.
+
+Already converted (do NOT redo these):
+
+* Form1      → Monitoring.cshtml + Monitoring.cshtml.cs + MonitoringService.cs + MonitoringRepository.cs + MonitoringModels.cs + Monitoring.js + Monitoring.css
+* Form4      → EvidenceMaking.cshtml + EvidenceMaking.cshtml.cs + EvidenceMakingService.cs (under Services/Reporting/) + EvidenceRepository.cs + EvidenceMakingModels.cs + EvidenceMaking.js + EvidenceMaking.css
+* Form_Input → ActionCards.cshtml + ActionCards.cshtml.cs + ActionCardService.cs + ActionCardRepository.cs + ActionCardModels.cs + ActionCards.js + ActionCards.css
+* Form5      → RawData.cshtml + RawData.cshtml.cs + RawDataService.cs + RawDataRepository.cs + RawDataModels.cs + RawData.js + RawData.css
+* Form6      → OcapViewer.cshtml + OcapViewer.cshtml.cs + OcapViewerService.cs + OcapViewerRepository.cs + OcapViewerModels.cs + OcapViewer.js + OcapViewer.css
+* Form7      → McdMonitoring.cshtml + McdMonitoring.cshtml.cs + McdMonitoringService.cs + McdMonitoringRepository.cs + McdMonitoringModels.cs + McdMonitoring.js + McdMonitoring.css
+* Form9      → Reports.cshtml + Reports.cshtml.cs + ReportsService.cs (under Services/Reporting/) + ReportsRepository.cs + ReportsModels.cs + Reports.js + Reports.css
+* Form2      → AlertBoard.cshtml + AlertBoard.cshtml.cs + AlertBoardService.cs + AlertBoardRepository.cs + AlertBoardModels.cs + AlertBoard.js + AlertBoard.css
+* Form3      → BmRecord.cshtml + BmRecord.cshtml.cs + BmRecordService.cs + BmRecordRepository.cs + BmRecordModels.cs + BmRecord.js + BmRecord.css
+           Source files: uC_Test.vb (main panel), uC_BMCaseWName.vb (single-machine history card),
+           uC_BMCase.vb (display sub-component), uC_Panel.vb (stub), uC_Form.vb (commented-out reference)
+* Form10     → TeEvidenceMaking.cshtml + TeEvidenceMaking.cshtml.cs + TeEvidenceMakingService.cs (under Services/Reporting/)
+                + TeEvidenceRepository.cs + TeEvidenceMakingModels.cs
+           Note: Form10 has no CSS/JS files — it is a chromeless popup page (Layout=null) that
+           auto-generates CWC.xlsx from TEBMEvidenceMaking + ViewTEData and serves it as a download.
+           The "E→" button in BmRecord.js opens /TeEvidenceMaking?bmId=X&autoGenerate=1 in a new tab.
+           NuGet used: ClosedXML 0.102.2 (already in .csproj). Template: Templates/EvidenceMaking/CWC.xlsx.
+
+Shared infrastructure already in place:
+
+* Program.cs — DI registers all repositories and services above
+* appsettings.json — DBConnection, AppVersion, EvidenceMaking:ImagesRoot/TemplatesRoot/OutputRoot
+* MachineKarte.Web.csproj — NuGet: ClosedXML 0.102.2, System.Data.SqlClient 4.8.6
+* Pages/Shared/_Layout.cshtml + _ViewStart.cshtml + _ViewImports.cshtml
+* Assets/css/site.css
+
+Conventions used throughout:
+
+* AJAX handlers are OnGet{Name}Async / OnPost{Name}Async on the Razor Page model
+* All responses wrapped in AjaxResult from MonitoringModels.cs
+* Anti-forgery token sent in header RequestVerificationToken on POST
+* SQL is plain parameterised SqlCommand — no Dapper, no EF
+* Folder structure:
+    Pages/
+    Models/
+    Services/
+    Services/Reporting/
+    Repositories/
+    Assets/css/
+    Assets/js/
+    Templates/EvidenceMaking/
+    Uploads/EvidenceImages/
+    TempData/GeneratedPdf/
+
+Remaining forms to convert (upload VB files before asking Claude to convert):
+
+* Form11 — Machine Summary view   (upload the Form11 VB files)
+* Form12 — BM Analytics / charts  (upload the Form12 VB files)
+
+Please continue converting the next uploaded VB form files using the same patterns established above.

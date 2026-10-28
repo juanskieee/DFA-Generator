@@ -1,4 +1,14 @@
-// ── Add these lines to Program.cs alongside the existing repository/service registrations ──
+// ── Add these lines to Program.cs alongside the existing registrations ──
 
-builder.Services.AddSingleton<AlertBoardRepository>();
-builder.Services.AddSingleton<AlertBoardService>();
+builder.Services.AddSingleton<TeEvidenceRepository>();
+builder.Services.AddSingleton<TeEvidenceMakingService>();
+
+// ── Also add the CWC.xlsx template to Templates/EvidenceMaking/ ──
+// The service looks for:  cfg["EvidenceMaking:TemplatesRoot"] + "/CWC.xlsx"
+// Make sure appsettings.json has:
+// "EvidenceMaking": {
+//   "TemplatesRoot": "Templates/EvidenceMaking",
+//   "ImagesRoot":    "Uploads/EvidenceImages",
+//   "OutputRoot":    "TempData/GeneratedPdf"
+// }
+// (These keys are already set for Form4; Form10 reuses them.)
